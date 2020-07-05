@@ -1,4 +1,4 @@
-package edu.lyuconl.config;
+package edu.lyuconl.node.config;
 
 /**
  * 静态配置信息

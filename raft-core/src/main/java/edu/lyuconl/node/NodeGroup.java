@@ -54,7 +54,6 @@ public class NodeGroup {
      */
     Collection<GroupMember> listReplicationTarget() {
         return memberMap.values().stream().filter(
-                m -> !m.idEquals(selfId)).collect(Collectors.toList()
-        );
+                m -> !m.idEquals(selfId)).collect(Collectors.toList());
     }
 }
