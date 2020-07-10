@@ -11,7 +11,7 @@ import java.util.List;
  * @date 2020年7月6日10点51分
  * @author 吕从雷
  */
-public class AppendEntries {
+public class AppendEntriesRpc {
     private int term;
     private NodeId leaderId;
     private int prevLogIndex = 0;

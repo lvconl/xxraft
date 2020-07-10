@@ -6,11 +6,11 @@ package edu.lyuconl.rpc.message;
  * @date 2020年7月6日10点59分
  * @author 吕从雷
  */
-public class AppendEntiresResult {
+public class AppendEntriesResult {
     private final int term;
     private final boolean success;
 
-    public AppendEntiresResult(int term, boolean success) {
+    public AppendEntriesResult(int term, boolean success) {
         this.term = term;
         this.success = success;
     }
