@@ -34,8 +34,8 @@ public class AbstractEntry implements Entry {
     }
 
     @Override
-    public EntryMate getMate() {
-        return new EntryMate(kind, term, index);
+    public EntryMeta getMate() {
+        return new EntryMeta(kind, term, index);
     }
 
     @Override

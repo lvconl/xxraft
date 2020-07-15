@@ -6,13 +6,13 @@ package edu.lyuconl.log.entry;
  * @date 2020年7月13日15点33分
  * @author lyuconl
  */
-public class EntryMate {
+public class EntryMeta {
 
     private final int kind;
     private final int term;
     private final int index;
 
-    public EntryMate(int kind, int term, int index) {
+    public EntryMeta(int kind, int term, int index) {
         this.kind = kind;
         this.term = term;
         this.index = index;

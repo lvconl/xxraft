@@ -1,5 +1,6 @@
 package edu.lyuconl.rpc.message;
 
+import edu.lyuconl.log.entry.Entry;
 import edu.lyuconl.node.NodeId;
 
 import java.util.Collections;
@@ -16,7 +17,7 @@ public class AppendEntriesRpc {
     private NodeId leaderId;
     private int prevLogIndex = 0;
     private int prevLogTerm;
-    private List<Object> entires = Collections.emptyList();
+        private List<Entry> entires = Collections.emptyList();
     private int leaderCommit;
 
     public int getTerm() {
@@ -51,11 +52,11 @@ public class AppendEntriesRpc {
         this.prevLogTerm = prevLogTerm;
     }
 
-    public List<Object> getEntires() {
+    public List<Entry> getEntires() {
         return entires;
     }
 
-    public void setEntires(List<Object> entires) {
+    public void setEntires(List<Entry> entires) {
         this.entires = entires;
     }
 

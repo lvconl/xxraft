@@ -38,7 +38,7 @@ public interface Entry {
      *
      * @return 日志条目元数据
      */
-    EntryMate getMate();
+    EntryMeta getMate();
 
     /**
      * 获取日志负载
