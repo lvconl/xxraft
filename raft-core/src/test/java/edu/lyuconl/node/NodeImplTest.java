@@ -125,4 +125,26 @@ public class NodeImplTest {
         AppendEntriesRpc rpc = (AppendEntriesRpc) messages.get(2).getRpc();
         Assert.assertEquals(1, rpc.getTerm());
     }
+
+    @Test
+    public void testOnAppendEntriesRpcFollower() {
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "localhost", 2333),
+                new NodeEndpoint("B", "localhost", 2334),
+                new NodeEndpoint("C", "localhost", 2335)
+        ).build();
+        node.start();
+        AppendEntriesRpc rpc = new AppendEntriesRpc();
+        rpc.setTerm(1);
+        rpc.setLeaderId(NodeId.of("B"));
+        node.onReceiveAppendEntriesRpc(new AppendEntriesRpcMessage(rpc, NodeId.of("B"), null));
+        MockConnector mockConnector = (MockConnector) node.getContext().getConnector();
+        AppendEntriesResult result = (AppendEntriesResult) mockConnector.getResult();
+        Assert.assertEquals(1, result.getTerm());
+        Assert.assertTrue(result.isSuccess());
+        FollowerNodeRole role = (FollowerNodeRole) node.getRole();
+        Assert.assertEquals(1, role.getTerm());
+        Assert.assertEquals(NodeId.of("B"), role.getLeaderId());
+    }
 }

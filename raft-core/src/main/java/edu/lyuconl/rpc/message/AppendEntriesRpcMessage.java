@@ -11,7 +11,7 @@ import edu.lyuconl.rpc.Channel;
  */
 public class AppendEntriesRpcMessage extends AbstractRpcMessage<AppendEntriesRpc> {
 
-    AppendEntriesRpcMessage(AppendEntriesRpc rpc, NodeId sourceNodeId, Channel channel) {
+    public AppendEntriesRpcMessage(AppendEntriesRpc rpc, NodeId sourceNodeId, Channel channel) {
         super(rpc, sourceNodeId, channel);
     }
 }
