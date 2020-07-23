@@ -147,4 +147,24 @@ public class NodeImplTest {
         Assert.assertEquals(1, role.getTerm());
         Assert.assertEquals(NodeId.of("B"), role.getLeaderId());
     }
+
+    @Test
+    public void testOnReceiveAppendEntriesNormal() {
+        NodeImpl node = (NodeImpl) newNodeBuilder(
+                NodeId.of("A"),
+                new NodeEndpoint("A", "localhost", 2333),
+                new NodeEndpoint("B", "localhost", 2334),
+                new NodeEndpoint("C", "localhost", 2335)
+        ).build();
+        node.start();
+        node.electionTimeout();
+        node.onReceiveRequestVoteResult(new RequestVoteResult(1, true));
+        // become leader
+        node.replicateLog();
+        node.onReceiveAppendEntriesResult(new AppendEntriesResultMessage(
+                new AppendEntriesResult(1, true),
+                NodeId.of("B"),
+                null
+                ));
+    }
 }

@@ -10,7 +10,7 @@ import edu.lyuconl.rpc.Channel;
  */
 public class AppendEntriesResultMessage extends AbstractRpcMessage<AppendEntriesResult> {
 
-    AppendEntriesResultMessage(AppendEntriesResult rpc, NodeId sourceNodeId, Channel channel) {
+    public AppendEntriesResultMessage(AppendEntriesResult rpc, NodeId sourceNodeId, Channel channel) {
         super(rpc, sourceNodeId, channel);
     }
 

@@ -285,6 +285,11 @@ public class NodeImpl implements Node {
         return true;
     }
 
+    @Subscribe
+    public void onReceiveAppendEntriesResult(AppendEntriesResultMessage resultMessage) {
+        context.taskExecutor().submit(() -> doProcessAppendEntriesResult(resultMessage));
+    }
+
     private void doProcessAppendEntriesResult(AppendEntriesResultMessage resultMessage) {
         AppendEntriesResult result = resultMessage.getRpc();
         // 如果对方的term比自己的大，则退化为Follower角色
