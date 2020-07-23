@@ -12,6 +12,8 @@ public class GroupMember {
     private final NodeEndpoint endpoint;
     private ReplicatingState replicatingState;
 
+    private boolean major;
+
     public GroupMember(NodeEndpoint endpoint, ReplicatingState replicatingState) {
         Preconditions.checkNotNull(endpoint);
         Preconditions.checkNotNull(replicatingState);
@@ -19,8 +21,14 @@ public class GroupMember {
         this.replicatingState = replicatingState;
     }
 
+    GroupMember(NodeEndpoint endpoint, ReplicatingState replicatingState, boolean major) {
+        this.endpoint = endpoint;
+        this.replicatingState = replicatingState;
+        this.major = major;
+    }
+
     public GroupMember(NodeEndpoint endpoint) {
-        this(endpoint, null);
+        this(endpoint, null, true);
     }
 
     public int getNextIndex() {
@@ -39,6 +47,18 @@ public class GroupMember {
     }
 
     public boolean idEquals(NodeId id) {
-        return endpoint.getId() == id;
+        return endpoint.getId().equals(id);
+    }
+
+    public NodeEndpoint getEndpoint() {
+        return endpoint;
+    }
+
+    public ReplicatingState getReplicatingState() {
+        return replicatingState;
+    }
+
+    boolean isMajor() {
+        return major;
     }
 }

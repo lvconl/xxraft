@@ -10,7 +10,7 @@ import edu.lyuconl.rpc.message.AppendEntriesRpc;
 import java.util.List;
 
 /**
- * 日志类
+ * 日志接口
  *
  * @date 2020年7月13日16点12分
  * @author lyuconl

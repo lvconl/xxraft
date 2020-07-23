@@ -13,4 +13,43 @@ public class NodeConfig {
     private int logReplicationInterval = 1000;
     private int logReplicationReadTimeout = 900;
 
+    public int getMinElectionTimeout() {
+        return minElectionTimeout;
+    }
+
+    public void setMinElectionTimeout(int minElectionTimeout) {
+        this.minElectionTimeout = minElectionTimeout;
+    }
+
+    public int getMaxElectionTimeout() {
+        return maxElectionTimeout;
+    }
+
+    public void setMaxElectionTimeout(int maxElectionTimeout) {
+        this.maxElectionTimeout = maxElectionTimeout;
+    }
+
+    public int getLogReplicationDelay() {
+        return logReplicationDelay;
+    }
+
+    public void setLogReplicationDelay(int logReplicationDelay) {
+        this.logReplicationDelay = logReplicationDelay;
+    }
+
+    public int getLogReplicationInterval() {
+        return logReplicationInterval;
+    }
+
+    public void setLogReplicationInterval(int logReplicationInterval) {
+        this.logReplicationInterval = logReplicationInterval;
+    }
+
+    public int getLogReplicationReadTimeout() {
+        return logReplicationReadTimeout;
+    }
+
+    public void setLogReplicationReadTimeout(int logReplicationReadTimeout) {
+        this.logReplicationReadTimeout = logReplicationReadTimeout;
+    }
 }

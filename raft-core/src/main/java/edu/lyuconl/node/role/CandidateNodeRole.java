@@ -1,5 +1,6 @@
 package edu.lyuconl.node.role;
 
+import edu.lyuconl.node.NodeId;
 import edu.lyuconl.schedule.ElectionTimeout;
 
 /**
@@ -42,6 +43,11 @@ public class CandidateNodeRole extends AbstractNodeRole {
     @Override
     public void cancelTimeoutOrTask() {
         electionTimeout.cancel();
+    }
+
+    @Override
+    public NodeId getLeaderId(NodeId selfId) {
+        return null;
     }
 
     /**

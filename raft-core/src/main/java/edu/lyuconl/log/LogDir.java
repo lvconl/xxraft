@@ -38,6 +38,13 @@ public interface LogDir {
     File getEntryOffsetIndexFile();
 
     /**
+     * 获取快照文件
+     *
+     * @return 快照文件
+     */
+    File getSnapshotFile();
+
+    /**
      * 获取目录
      *
      * @return 目录

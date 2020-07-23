@@ -1,5 +1,7 @@
 package edu.lyuconl.node.role;
 
+import edu.lyuconl.node.NodeId;
+
 /**
  * 系统角色抽象父类
  *
@@ -27,4 +29,12 @@ public abstract class AbstractNodeRole {
     public int getTerm() {
         return term;
     }
+
+    /**
+     * get the leader's id
+     *
+     * @param selfId the node self id
+     * @return the leader's id
+     */
+    public abstract NodeId getLeaderId(NodeId selfId);
 }

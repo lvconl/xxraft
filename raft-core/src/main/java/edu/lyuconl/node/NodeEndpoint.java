@@ -19,6 +19,10 @@ public class NodeEndpoint {
         this.address = address;
     }
 
+    public NodeEndpoint(String id, String host, int port) {
+        this(new NodeId(id), new Address(host, port));
+    }
+
     public Address getAddress() {
         return address;
     }

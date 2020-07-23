@@ -1,9 +1,6 @@
 package edu.lyuconl.node;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,5 +52,29 @@ public class NodeGroup {
     Collection<GroupMember> listReplicationTarget() {
         return memberMap.values().stream().filter(
                 m -> !m.idEquals(selfId)).collect(Collectors.toList());
+    }
+
+    /**
+     * 列出除当前节点以外的其它节点
+     *
+     * @return 除当前节点以外的其它节点
+     */
+    Set<NodeEndpoint> listEndpointExceptSelf() {
+        Set<NodeEndpoint> endpoints = new HashSet<>();
+        for (GroupMember member : memberMap.values()) {
+            // 判断是不是当前节点
+            if (!member.idEquals(selfId)) {
+                endpoints.add(member.getEndpoint());
+            }
+        }
+        return endpoints;
+    }
+
+    int getCount() {
+        return (int) memberMap.values().stream().filter(GroupMember::isMajor).count();
+    }
+
+    boolean isStandalone() {
+        return memberMap.size() == 1 && memberMap.containsKey(selfId);
     }
 }

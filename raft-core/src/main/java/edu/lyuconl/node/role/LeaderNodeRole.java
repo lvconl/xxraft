@@ -1,5 +1,6 @@
 package edu.lyuconl.node.role;
 
+import edu.lyuconl.node.NodeId;
 import edu.lyuconl.schedule.LogReplicationTask;
 
 /**
@@ -20,6 +21,11 @@ public class LeaderNodeRole extends AbstractNodeRole{
     @Override
     public void cancelTimeoutOrTask() {
         logReplicationTask.cancel();
+    }
+
+    @Override
+    public NodeId getLeaderId(NodeId selfId) {
+        return selfId;
     }
 
     @Override

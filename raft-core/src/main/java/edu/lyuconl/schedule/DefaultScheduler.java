@@ -1,5 +1,7 @@
 package edu.lyuconl.schedule;
 
+import edu.lyuconl.node.config.NodeConfig;
+
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,6 +21,11 @@ public class DefaultScheduler implements Scheduler {
     private final int logReplicationInterval;
     private final Random electionTimeoutRandom;
     private final ScheduledExecutorService scheduledExecutorService;
+
+    public DefaultScheduler(NodeConfig config) {
+        this(config.getMinElectionTimeout(), config.getMaxElectionTimeout(),
+                config.getLogReplicationDelay(), config.getLogReplicationInterval());
+    }
 
     /**
      * 构造函数

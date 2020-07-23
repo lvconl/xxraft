@@ -15,5 +15,5 @@ public interface Node {
     /**
      * 停止方法
      */
-    void stop();
+    void stop() throws Exception;
 }

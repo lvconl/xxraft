@@ -7,7 +7,7 @@ package edu.lyuconl.log.entry;
  * @author lyuconl
  */
 public class NoOpEntry extends AbstractEntry {
-    NoOpEntry(int index, int term) {
+    public NoOpEntry(int index, int term) {
         super(KIND_NO_OP, index, term);
     }
 
