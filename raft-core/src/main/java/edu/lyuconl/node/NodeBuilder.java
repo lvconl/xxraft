@@ -2,6 +2,7 @@ package edu.lyuconl.node;
 
 import com.google.common.eventbus.EventBus;
 import edu.lyuconl.log.Log;
+import edu.lyuconl.log.MemoryLog;
 import edu.lyuconl.node.config.NodeConfig;
 import edu.lyuconl.node.store.MemoryNodeStore;
 import edu.lyuconl.node.store.NodeStore;
@@ -30,8 +31,7 @@ public class NodeBuilder {
     private boolean standby = false;
     private Log log = null;
     private NodeStore store;
-
-    private final NodeConfig config = new NodeConfig();
+    private NodeConfig config = new NodeConfig();
 
     public NodeBuilder(NodeEndpoint endpoint) {
         this(Collections.singletonList(endpoint), endpoint.getId());
@@ -73,8 +73,10 @@ public class NodeBuilder {
         context.setSelfId(selfId);
         context.setStore(store != null ? store : new MemoryNodeStore());
         context.setEventBus(eventBus);
+        context.setLog(log != null ? log : new MemoryLog());
         context.setScheduler(scheduler != null ? scheduler : new DefaultScheduler(config));
         context.setConnector(connector);
+        context.setConfig(config);
         context.setTaskExecutor(taskExecutor != null ? taskExecutor : new SingleThreadTaskExecutor("node"));
         return context;
     }

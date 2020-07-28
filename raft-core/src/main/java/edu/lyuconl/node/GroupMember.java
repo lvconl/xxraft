@@ -28,7 +28,7 @@ public class GroupMember {
     }
 
     public GroupMember(NodeEndpoint endpoint) {
-        this(endpoint, null, true);
+        this(endpoint, new ReplicatingState(1), true);
     }
 
     public int getNextIndex() {
@@ -58,7 +58,15 @@ public class GroupMember {
         return replicatingState;
     }
 
+    public boolean advanceReplicatingState(int lastEntryIndex) {
+        return ensureReplicatingState().advance(lastEntryIndex);
+    }
+
     boolean isMajor() {
         return major;
+    }
+
+    boolean backOffNextIndex() {
+        return ensureReplicatingState().backOffNextIndex();
     }
 }

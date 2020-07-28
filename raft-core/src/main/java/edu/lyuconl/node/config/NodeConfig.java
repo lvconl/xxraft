@@ -1,5 +1,7 @@
 package edu.lyuconl.node.config;
 
+import edu.lyuconl.log.Log;
+
 /**
  * 静态配置信息
  *
@@ -12,6 +14,7 @@ public class NodeConfig {
     private int logReplicationDelay = 0;
     private int logReplicationInterval = 1000;
     private int logReplicationReadTimeout = 900;
+    private int maxReplicationEntries = Log.ALL_ENTRIES;
 
     public int getMinElectionTimeout() {
         return minElectionTimeout;
@@ -51,5 +54,13 @@ public class NodeConfig {
 
     public void setLogReplicationReadTimeout(int logReplicationReadTimeout) {
         this.logReplicationReadTimeout = logReplicationReadTimeout;
+    }
+
+    public int getMaxReplicationEntries() {
+        return maxReplicationEntries;
+    }
+
+    public void setMaxReplicationEntries(int maxReplicationEntries) {
+        this.maxReplicationEntries = maxReplicationEntries;
     }
 }

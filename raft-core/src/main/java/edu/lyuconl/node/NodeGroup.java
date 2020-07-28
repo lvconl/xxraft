@@ -1,5 +1,9 @@
 package edu.lyuconl.node;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,6 +14,9 @@ import java.util.stream.Collectors;
  * @author 吕从雷
  */
 public class NodeGroup {
+
+    private static final Logger logger = LoggerFactory.getLogger(NodeGroup.class);
+
     private NodeId selfId;
     private Map<NodeId, GroupMember> memberMap;
 
@@ -76,5 +83,49 @@ public class NodeGroup {
 
     boolean isStandalone() {
         return memberMap.size() == 1 && memberMap.containsKey(selfId);
+    }
+
+    int getMatchIndexOfMajor() {
+        List<NodeMatchIndex> matchIndices = new ArrayList<>();
+        for (GroupMember member : memberMap.values()) {
+            if (member.isMajor() && !member.idEquals(selfId)) {
+                matchIndices.add(new NodeMatchIndex(member.getEndpoint().getId(), member.getMatchIndex()));
+            }
+        }
+        int count = matchIndices.size();
+        if (count == 0) {
+            throw new IllegalStateException("standalone or no major node");
+        }
+        Collections.sort(matchIndices);
+        logger.debug("match indices {}", matchIndices);
+        return matchIndices.get(count / 2).getMatchIndex();
+    }
+
+    private static class NodeMatchIndex implements Comparable<NodeMatchIndex> {
+
+        private final NodeId nodeId;
+        private final int matchIndex;
+
+        NodeMatchIndex(NodeId nodeId, int matchIndex) {
+            this.nodeId = nodeId;
+            this.matchIndex = matchIndex;
+        }
+
+        public int getMatchIndex() {
+            return matchIndex;
+        }
+
+        @Override
+        public int compareTo(@Nonnull NodeMatchIndex o) {
+            return -Integer.compare(o.matchIndex, this.matchIndex);
+        }
+
+        @Override
+        public String toString() {
+            return "NodeMatchIndex{" +
+                    "nodeId=" + nodeId +
+                    ", matchIndex=" + matchIndex +
+                    '}';
+        }
     }
 }

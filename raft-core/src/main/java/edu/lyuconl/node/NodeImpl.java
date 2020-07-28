@@ -1,6 +1,7 @@
 package edu.lyuconl.node;
 
 import com.google.common.eventbus.Subscribe;
+import edu.lyuconl.log.entry.EntryMeta;
 import edu.lyuconl.node.role.*;
 import edu.lyuconl.node.store.NodeStore;
 import edu.lyuconl.rpc.message.*;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Objects;
+import java.util.regex.Matcher;
 
 /**
  * 节点具体实现（核心组件）
@@ -116,11 +118,12 @@ public class NodeImpl implements Node {
         changeToRole(new CandidateNodeRole(newTerm, scheduleElectionTimeout()));
 
         // 发送RequestVote消息
+        EntryMeta lastEntryMeta = context.getLog().getLastEntryMeta();
         RequestVoteRpc rpc = new RequestVoteRpc();
         rpc.setTerm(newTerm);
         rpc.setCandidateId(context.getSelfId());
-        rpc.setLastLogIndex(0);
-        rpc.setLastLogTerm(0);
+        rpc.setLastLogIndex(lastEntryMeta.getIndex());
+        rpc.setLastLogTerm(lastEntryMeta.getTerm());
         context.getConnector().sendRequestVote(rpc, context.getGroup().listEndpointExceptSelf());
     }
 
@@ -140,7 +143,7 @@ public class NodeImpl implements Node {
             return new RequestVoteResult(role.getTerm(), false);
         }
 
-        boolean voteForCandidate = true;
+        boolean voteForCandidate = !context.getLog().isNewerThan(rpc.getLastLogIndex(), rpc.getLastLogTerm());
 
         // 如果对象的term比自己的大，则切换为Follower角色
         if (rpc.getTerm() > role.getTerm()) {
@@ -229,7 +232,7 @@ public class NodeImpl implements Node {
         logger.debug("replicate log");
         // 向日志复制对象发送AppendEntries消息
         for (GroupMember member : context.getGroup().listReplicationTarget()) {
-            doReplicateLog(member);
+            doReplicateLog(member, context.getConfig().getMaxReplicationEntries());
         }
     }
 
@@ -240,6 +243,12 @@ public class NodeImpl implements Node {
         rpc.setPrevLogIndex(0);
         rpc.setPrevLogTerm(0);
         rpc.setLeaderCommit(0);
+        context.getConnector().sendAppendEntries(rpc, member.getEndpoint());
+    }
+
+    private void doReplicateLog(GroupMember member, int maxEntries) {
+        AppendEntriesRpc rpc = context.getLog().createAppendEntriesRpc(role.getTerm(), context.getSelfId(),
+                        member.getNextIndex(), maxEntries);
         context.getConnector().sendAppendEntries(rpc, member.getEndpoint());
     }
 
@@ -282,7 +291,15 @@ public class NodeImpl implements Node {
     }
 
     private boolean appendEntries(AppendEntriesRpc rpc) {
-        return true;
+        boolean result = context.getLog().appendEntriesFromLeader(
+                rpc.getPrevLogIndex(), rpc.getPrevLogTerm(), rpc.getEntires()
+        );
+        if (result) {
+            context.getLog().advanceCommitIndex(
+                    Math.min(rpc.getLeaderCommit(), rpc.getLastEntryIndex()), rpc.getTerm()
+            );
+        }
+        return result;
     }
 
     @Subscribe
@@ -291,7 +308,7 @@ public class NodeImpl implements Node {
     }
 
     private void doProcessAppendEntriesResult(AppendEntriesResultMessage resultMessage) {
-        AppendEntriesResult result = resultMessage.getRpc();
+        AppendEntriesResult result = resultMessage.get();
         // 如果对方的term比自己的大，则退化为Follower角色
         if (result.getTerm() > role.getTerm()) {
             becomeFollower(result.getTerm(), null, null, true);
@@ -301,6 +318,26 @@ public class NodeImpl implements Node {
         if (role.getName() != RoleName.LEADER) {
             logger.warn("receive append entries result from node {} but current node is not leader, ignore",
                     resultMessage.getSourceNodeId());
+        }
+        NodeId sourceNodeId = resultMessage.getSourceNodeId();
+        GroupMember member = context.getGroup().getMember(sourceNodeId);
+        if (member == null) {
+            logger.info("unexpected append entries result from node {}, node maybe removed", sourceNodeId);
+            return;
+        }
+        AppendEntriesRpc rpc = resultMessage.getRpc();
+        if (result.isSuccess()) {
+            // 回复成功
+            // 推进matchIndex和nextIndex
+            if (member.advanceReplicatingState(rpc.getLastEntryIndex())) {
+                // 推进本地commitIndex
+                context.getLog().advanceCommitIndex(context.getGroup().getMatchIndexOfMajor(), role.getTerm());
+            }
+        } else {
+            // 对方回复失败
+            if (!member.backOffNextIndex()) {
+                logger.warn("cannot back off next index more, node {}", sourceNodeId);
+            }
         }
     }
 
