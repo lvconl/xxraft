@@ -54,6 +54,7 @@ public class FileEntrySequence extends AbstractEntrySequence {
         }
         logIndexOffset = entryIndexFile.getMinEntryIndex();
         nextLogIndex = entryIndexFile.getMaxEntryIndex() + 1;
+        commitIndex = entryIndexFile.getMaxEntryIndex();
     }
 
     @Override
@@ -72,7 +73,7 @@ public class FileEntrySequence extends AbstractEntrySequence {
     protected List<Entry> doSubList(int fromIndex, int toIndex) {
         List<Entry> result = new ArrayList<>();
         if (!entryIndexFile.isEmpty() && fromIndex <= entryIndexFile.getMaxEntryIndex()) {
-            int maxIndex = Math.max(entryIndexFile.getMaxEntryIndex() + 1, toIndex);
+            int maxIndex = Math.min(entryIndexFile.getMaxEntryIndex() + 1, toIndex);
             for (int i = fromIndex; i < maxIndex; i++) {
                 result.add(getEntryInFile(i));
             }
