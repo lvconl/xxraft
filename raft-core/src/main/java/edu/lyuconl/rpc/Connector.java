@@ -57,8 +57,12 @@ public interface Connector {
                             NodeEndpoint destinationEndpoint);
 
     /**
+     * 重置连接
+     */
+    void resetChannels();
+
+    /**
      * 关闭方法
-     *
      */
     void close();
 }
