@@ -2,6 +2,7 @@ package edu.lyuconl.rpc.nio;
 
 import com.google.common.eventbus.EventBus;
 import edu.lyuconl.node.NodeEndpoint;
+import edu.lyuconl.node.NodeId;
 import edu.lyuconl.rpc.Connector;
 import edu.lyuconl.rpc.message.AppendEntriesResult;
 import edu.lyuconl.rpc.message.AppendEntriesRpc;
@@ -45,7 +46,24 @@ public class NioConnector implements Connector {
      */
     private final int port;
 
-    private final
+    private final InboundChannelGroup inboundChannelGroup = new InboundChannelGroup();
+    private final OutboundChannelGroup outboundChannelGroup;
+
+    public NioConnector(NioEventLoopGroup workerNioEventLoopGroup, boolean workerGroupShared, NodeId selfNodeId, EventBus eventBus, int port) {
+        this.workerNioEventLoopGroup = workerNioEventLoopGroup;
+        this.workerGroupShared = workerGroupShared;
+        this.eventBus = eventBus;
+        this.port = port;
+        outboundChannelGroup = new OutboundChannelGroup(workerNioEventLoopGroup, eventBus, selfNodeId);
+    }
+
+    public NioConnector(NioEventLoopGroup workerNioEventLoopGroup, NodeId selfNodeId, EventBus eventBus, int port) {
+        this(workerNioEventLoopGroup, true, selfNodeId, eventBus, port);
+    }
+
+    public NioConnector(NodeId selfNodeId, EventBus eventBus, int port) {
+        this(new NioEventLoopGroup(), false, selfNodeId, eventBus, port);
+    }
 
     @Override
     public void initialize() {

@@ -1,4 +1,4 @@
-package edu.lyuconl.node;
+package edu.lyuconl.rpc;
 
 import com.google.common.base.Preconditions;
 

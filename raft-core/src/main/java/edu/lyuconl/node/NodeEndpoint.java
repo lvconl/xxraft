@@ -1,6 +1,7 @@
 package edu.lyuconl.node;
 
 import com.google.common.base.Preconditions;
+import edu.lyuconl.rpc.Address;
 
 /**
  * 连接节点的基本信息，包括 IP地址以及端口
