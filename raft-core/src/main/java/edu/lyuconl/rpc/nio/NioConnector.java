@@ -8,11 +8,17 @@ import edu.lyuconl.rpc.message.AppendEntriesResult;
 import edu.lyuconl.rpc.message.AppendEntriesRpc;
 import edu.lyuconl.rpc.message.RequestVoteResult;
 import edu.lyuconl.rpc.message.RequestVoteRpc;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.net.ConnectException;
 import java.util.Collection;
 
 /**
@@ -67,7 +73,24 @@ public class NioConnector implements Connector {
 
     @Override
     public void initialize() {
-
+        ServerBootstrap serverBootstrap = new ServerBootstrap()
+                .group(bossNioEventLoopGroup, workerNioEventLoopGroup)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel channel) throws Exception {
+                        ChannelPipeline pipeline = channel.pipeline();
+                        pipeline.addLast(new Decoder());
+                        pipeline.addLast(new Encoder());
+                        pipeline.addLast(new FromRemoteHandler(eventBus, inboundChannelGroup));
+                    }
+                });
+        logger.debug("node listen on port {}", port);
+        try {
+            serverBootstrap.bind(port).sync();
+        } catch (InterruptedException e) {
+            throw new ConnectorException("failed to bind port", e);
+        }
     }
 
     @Override
@@ -97,6 +120,12 @@ public class NioConnector implements Connector {
 
     @Override
     public void close() {
-
+        logger.debug("close connector");
+        inboundChannelGroup.closeAll();
+        outboundChannelGroup.closeAll();
+        bossNioEventLoopGroup.shutdownGracefully();
+        if (!workerGroupShared) {
+            workerNioEventLoopGroup.shutdownGracefully();
+        }
     }
 }
