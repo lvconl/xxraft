@@ -1,13 +1,13 @@
 package edu.lyuconl.rpc.nio;
 
+import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import edu.lyuconl.node.NodeEndpoint;
 import edu.lyuconl.node.NodeId;
+import edu.lyuconl.rpc.Channel;
+import edu.lyuconl.rpc.ChannelException;
 import edu.lyuconl.rpc.Connector;
-import edu.lyuconl.rpc.message.AppendEntriesResult;
-import edu.lyuconl.rpc.message.AppendEntriesRpc;
-import edu.lyuconl.rpc.message.RequestVoteResult;
-import edu.lyuconl.rpc.message.RequestVoteRpc;
+import edu.lyuconl.rpc.message.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.net.ConnectException;
 import java.util.Collection;
 
 /**
@@ -95,27 +94,59 @@ public class NioConnector implements Connector {
 
     @Override
     public void sendRequestVote(RequestVoteRpc rpc, Collection<NodeEndpoint> destinationEndpoints) {
-
+        Preconditions.checkNotNull(rpc);
+        Preconditions.checkNotNull(destinationEndpoints);
+        for (NodeEndpoint endpoint : destinationEndpoints) {
+            logger.debug("send {} to node {}", rpc, endpoint.getId());
+            try {
+                getChannel(endpoint).writeRequestVoteRpc(rpc);
+            } catch (Exception e) {
+                logException(e);
+            }
+        }
     }
 
     @Override
-    public void replyRequestVote(RequestVoteResult result, NodeEndpoint destinationEndpoint) {
-
+    public void replyRequestVote(RequestVoteResult result, RequestVoteRpcMessage rpcMessage) {
+        Preconditions.checkNotNull(result);
+        Preconditions.checkNotNull(rpcMessage);
+        logger.debug("reply {} to node {}", result, rpcMessage.getSourceNodeId());
+        try {
+            rpcMessage.getChannel().writeRequestVoteResult(result);
+        } catch (Exception e) {
+            logException(e);
+        }
     }
+
 
     @Override
     public void sendAppendEntries(AppendEntriesRpc rpc, NodeEndpoint destinationEndpoint) {
-
+        Preconditions.checkNotNull(rpc);
+        Preconditions.checkNotNull(destinationEndpoint);
+        logger.debug("send {} to node {}", rpc, destinationEndpoint.getId());
+        try {
+            getChannel(destinationEndpoint).writeAppendEntriesRpc(rpc);
+        } catch (Exception e) {
+            logException(e);
+        }
     }
 
     @Override
-    public void replyAppendEntries(AppendEntriesResult result, NodeEndpoint destinationEndpoint) {
-
+    public void replyAppendEntries(AppendEntriesResult result, AppendEntriesRpcMessage rpcMessage) {
+        Preconditions.checkNotNull(result);
+        Preconditions.checkNotNull(rpcMessage);
+        logger.debug("reply {} to node {}", result, rpcMessage.getSourceNodeId());
+        try {
+            rpcMessage.getChannel().writeAppendEntriesResult(result);
+        } catch (Exception e) {
+            logException(e);
+        }
     }
+
 
     @Override
     public void resetChannels() {
-
+        inboundChannelGroup.closeAll();
     }
 
     @Override
@@ -127,5 +158,17 @@ public class NioConnector implements Connector {
         if (!workerGroupShared) {
             workerNioEventLoopGroup.shutdownGracefully();
         }
+    }
+
+    private void logException(Exception e) {
+        if (e instanceof ChannelException) {
+            logger.warn(e.getMessage());
+        } else {
+            logger.warn("failed to process channel", e);
+        }
+    }
+
+    private Channel getChannel(NodeEndpoint endpoint) {
+        return outboundChannelGroup.getOrConnect(endpoint.getId(), endpoint.getAddress());
     }
 }

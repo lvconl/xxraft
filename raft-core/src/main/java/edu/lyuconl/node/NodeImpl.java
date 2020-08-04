@@ -131,7 +131,7 @@ public class NodeImpl implements Node {
     public void onReceiveRequestVoteRpc(RequestVoteRpcMessage rpcMessage) {
         context.taskExecutor().submit(() -> context.getConnector().replyRequestVote(
                 doProcessRequestVoteRpc(rpcMessage),
-                context.getGroup().findMember(rpcMessage.getSourceNodeId()).getEndpoint()
+                rpcMessage
         ));
     }
 
@@ -254,7 +254,7 @@ public class NodeImpl implements Node {
 
     public void onReceiveAppendEntriesRpc(AppendEntriesRpcMessage rpcMessage) {
         context.taskExecutor().submit(() -> context.getConnector().replyAppendEntries(doProcessAppendEntriesRpc(rpcMessage),
-                context.getGroup().findMember(rpcMessage.getSourceNodeId()).getEndpoint()));
+                rpcMessage));
     }
 
     private AppendEntriesResult doProcessAppendEntriesRpc(AppendEntriesRpcMessage rpcMessage) {

@@ -19,9 +19,9 @@ import java.io.IOException;
  * @author lyuconl
  * @date 2020年7月31日14点50分
  */
-class Encoder extends MessageToByteEncoder<Object> {
+public class Encoder extends MessageToByteEncoder<Object> {
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
+    public void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
         // 判断消息类型
         if (msg instanceof NodeId) {
             this.writeMessage(out, MessageConstants.MSG_TYPE_NODE_ID, ((NodeId) msg).getValue().getBytes() );
@@ -31,7 +31,7 @@ class Encoder extends MessageToByteEncoder<Object> {
                     .setTerm(rpc.getTerm())
                     .setCandidateId(rpc.getCandidateId().getValue())
                     .setLastLogIndex(rpc.getLastLogIndex())
-                    .setLastLogTerm(rpc.getTerm())
+                    .setLastLogTerm(rpc.getLastLogTerm())
                     .build();
             this.writeMessage(out,
                     MessageConstants.MSG_TYPE_REQUEST_VOTE_RPC, protoRpc);

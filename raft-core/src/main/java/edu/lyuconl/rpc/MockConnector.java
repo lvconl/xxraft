@@ -2,10 +2,7 @@ package edu.lyuconl.rpc;
 
 import edu.lyuconl.node.NodeEndpoint;
 import edu.lyuconl.node.NodeId;
-import edu.lyuconl.rpc.message.AppendEntriesResult;
-import edu.lyuconl.rpc.message.AppendEntriesRpc;
-import edu.lyuconl.rpc.message.RequestVoteResult;
-import edu.lyuconl.rpc.message.RequestVoteRpc;
+import edu.lyuconl.rpc.message.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,10 +32,10 @@ public class MockConnector implements Connector {
     }
 
     @Override
-    public void replyRequestVote(RequestVoteResult result, NodeEndpoint destinationEndpoint) {
+    public void replyRequestVote(RequestVoteResult result, RequestVoteRpcMessage rpcMessage) {
         Message msg = new Message();
         msg.result = result;
-        msg.destinationNodeId = destinationEndpoint.getId();
+        msg.destinationNodeId = rpcMessage.getSourceNodeId();
         messages.add(msg);
     }
 
@@ -51,11 +48,16 @@ public class MockConnector implements Connector {
     }
 
     @Override
-    public void replyAppendEntries(AppendEntriesResult result, NodeEndpoint destinationEndpoint) {
+    public void replyAppendEntries(AppendEntriesResult result, AppendEntriesRpcMessage rpcMessage) {
         Message msg = new Message();
         msg.result = result;
-        msg.destinationNodeId = destinationEndpoint.getId();
+        msg.destinationNodeId = rpcMessage.getSourceNodeId();
         messages.add(msg);
+    }
+
+    @Override
+    public void resetChannels() {
+
     }
 
     /**

@@ -16,9 +16,9 @@ import java.util.List;
  * @date 2020年7月31日15点35分
  * @author lyuconl
  */
-class Decoder extends ByteToMessageDecoder {
+public class Decoder extends ByteToMessageDecoder {
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    public void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         // 预读8字节, type + len
         int typeAndLen = 8;
         int availableBytes = in.readableBytes();

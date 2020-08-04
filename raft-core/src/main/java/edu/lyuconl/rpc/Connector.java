@@ -1,10 +1,7 @@
 package edu.lyuconl.rpc;
 
 import edu.lyuconl.node.NodeEndpoint;
-import edu.lyuconl.rpc.message.AppendEntriesResult;
-import edu.lyuconl.rpc.message.AppendEntriesRpc;
-import edu.lyuconl.rpc.message.RequestVoteResult;
-import edu.lyuconl.rpc.message.RequestVoteRpc;
+import edu.lyuconl.rpc.message.*;
 
 import java.util.Collection;
 
@@ -33,10 +30,10 @@ public interface Connector {
      * 回复RequestVote给单个节点
      *
      * @param result 投票结果
-     * @param destinationEndpoint 目标主机
+     * @param rpcMessage 请求消息
      */
     void replyRequestVote(RequestVoteResult result,
-                          NodeEndpoint destinationEndpoint);
+                          RequestVoteRpcMessage rpcMessage);
 
     /**
      * 发送AppendEntries给单个节点
@@ -51,10 +48,10 @@ public interface Connector {
      * AppendEntries回复
      *
      * @param result 回复结果
-     * @param destinationEndpoint 目标主机
+     * @param rpcMessage 请求消息
      */
     void replyAppendEntries(AppendEntriesResult result,
-                            NodeEndpoint destinationEndpoint);
+                            AppendEntriesRpcMessage rpcMessage);
 
     /**
      * 重置连接
